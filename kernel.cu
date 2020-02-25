@@ -29,7 +29,7 @@ void matrixMultiplication(int *A, int *B, int *C, int N){
     // use 1 to 512 threads per block
     dim3 threadsPerBlock(N, N);
     dim3 blocksPerGrid(1, 1);
-        if (N*N > 512){
+        if (N*N > 1024){
             threadsPerBlock.x = 512;
             threadsPerBlock.y = 512;
             blocksPerGrid.x = ceil(double(N)/double(threadsPerBlock.x));
