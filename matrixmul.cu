@@ -44,7 +44,7 @@ int main()
     clock_t begin = clock();
 
     matrixMultiplication(d_A.getData(), d_B.getData(), d_C.getData(), N);
-    
+
     clock_t end = clock();
     time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
 
@@ -104,6 +104,13 @@ int main()
     for (int c = 0; c < N ; c++) {
       for (int d = 0; d < N; d++)
         printf("%d\t", cpu_C[c*N+d]);
+
+      printf("\n");
+    }
+
+    for (int c = 0; c < N ; c++) {
+      for (int d = 0; d < N; d++)
+        printf("%d\t", h_C[c*N+d]);
 
       printf("\n");
     }
