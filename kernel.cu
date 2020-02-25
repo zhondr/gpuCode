@@ -36,5 +36,10 @@ void matrixMultiplication(int *A, int *B, int *C, int N){
             blocksPerGrid.y = ceil(double(N)/double(threadsPerBlock.y));
         }
 
+    printf("%i\n", threadsPerBlock.x);
+    printf("%i\n", threadsPerBlock.y);
+    printf("%i\n", blocksPerGrid.x);
+    printf("%i\n", blocksPerGrid.y);
+
     matrixMultiplicationKernel<<<blocksPerGrid,threadsPerBlock>>>(A, B, C, N);
 }
