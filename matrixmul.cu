@@ -14,7 +14,7 @@ int main()
 {
     // Perform matrix multiplication C = A*B
     // where A, B and C are NxN matrices
-    int N = 10;
+    int N = 23;
     int SIZE = N*N;
 
     // Allocate memory on the host
@@ -25,8 +25,8 @@ int main()
     // Initialize matrices on the host
     for (int i=0; i<N; i++){
         for (int j=0; j<N; j++){
-            h_A[i*N+j] = i+1;
-            h_B[i*N+j] = i+1;
+            h_A[i*N+j] = j+1;
+            h_B[i*N+j] = N-i;
         }
     }
 
