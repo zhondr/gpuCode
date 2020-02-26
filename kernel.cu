@@ -33,6 +33,6 @@ void matrixMultiplication(int *A, int *B, int *C, int N){
           threadsPerBlock.y = floor(512/N);
           blocksPerGrid.x = ceil(N*N/threadsPerBlock.y);
       }
-      
+
     matrixMultiplicationKernel<<<blocksPerGrid,threadsPerBlock>>>(A, B, C, N);
 }
