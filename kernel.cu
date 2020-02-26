@@ -30,16 +30,9 @@ void matrixMultiplication(int *A, int *B, int *C, int N){
     dim3 threadsPerBlock(N, N);
     dim3 blocksPerGrid(1, 1);
         if (N*N > 512){
-            threadsPerBlock.x = 512;
-            threadsPerBlock.y = 512;
-            blocksPerGrid.x = ceil(double(N)/double(threadsPerBlock.x));
-            blocksPerGrid.y = ceil(double(N)/double(threadsPerBlock.y));
+            threadsPerBlock.y = floor(512/N);
+            blocksPerGrid.x = ceil(N*N/threadsPerBlock.y);
         }
-
-    printf("%i\n", threadsPerBlock.x);
-    printf("%i\n", threadsPerBlock.y);
-    printf("%i\n", blocksPerGrid.x);
-    printf("%i\n", blocksPerGrid.y);
-
+        
     matrixMultiplicationKernel<<<blocksPerGrid,threadsPerBlock>>>(A, B, C, N);
 }
