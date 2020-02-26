@@ -14,7 +14,7 @@ int main()
 {
     // Perform matrix multiplication C = A*B
     // where A, B and C are NxN matrices
-    int N = 5;
+    int N = 100;
     int cycleNum = 10000;
 
 
@@ -45,10 +45,9 @@ int main()
     d_B.set(&h_B[0], SIZE);
     end = clock();
     gpuOverheadTime = gpuOverheadTime + ((double)(end - begin) / CLOCKS_PER_SEC);
-    printf("dA dB initialization: %f\n",gpuOverheadTime);
-    
+
     double time_spent=0;
-    //double tmpGpuOverheadTime=0;
+    double tmpGpuOverheadTime=0;
 
     for (int i=0;i<cycleNum;i++) {
       begin = clock();
@@ -56,28 +55,26 @@ int main()
       end = clock();
       time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
 
-      //tmpGpuOverheadTime = tmpGpuOverheadTime + ((double)(end - begin) / CLOCKS_PER_SEC);
+      begin = clock();
+        cudaDeviceSynchronize();
+        d_C.get(&h_C[0], SIZE);
+        cudaDeviceSynchronize();
+      end = clock();
+      tmpGpuOverheadTime = tmpGpuOverheadTime + ((double)(end - begin) / CLOCKS_PER_SEC);
     }
+    gpuOverheadTime = gpuOverheadTime + tmpGpuOverheadTime/cycleNum;
+    printf("%i,%f,%f,",M,time_spent/cycleNum,time_spent/cycleNum+gpuOverheadTime);
 
-    begin = clock();
-     cudaDeviceSynchronize();
-     d_C.get(&h_C[0], SIZE);
-     cudaDeviceSynchronize();
-    end = clock();
-
-    gpuOverheadTime = gpuOverheadTime + ((double)(end - begin) / CLOCKS_PER_SEC);
-    printf("dA dB init + sync + dc + sync: %f\n",gpuOverheadTime);
-    //gpuOverheadTime = gpuOverheadTime + tmpGpuOverheadTime;
-    printf("M = %d\n",M);
+/*   printf("M = %d\n",M);
     //printf("Time is calculated on %i cycles\n",cycleNum);
     //printf("\n");
     //printf("Overall time on GPU: %f\n",time_spent);
     printf("Average time on GPU: %f\n",time_spent/cycleNum+gpuOverheadTime);
     printf("Calculation time on GPU: %f\n",time_spent/cycleNum);
     printf("Copying time to Device Memory and back to Host Memory: %f\n",gpuOverheadTime);
-/*
+
     printf("-------------------------------\n");
-    */
+*/
     int *cpu_C;
     cpu_C=new int[SIZE];
     time_spent=0;
@@ -100,7 +97,9 @@ int main()
     clock_t end = clock();
     time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
    }
-   /* 
+   printf("%f\n",time_spent/cycleNum);
+
+/*
     //printf("Overall time on CPU: %f\n",time_spent);
     printf("Average time on CPU: %f\n",time_spent/cycleNum);
     printf("\n");
@@ -132,8 +131,6 @@ int main()
 
     cout << "Error: " << err << endl;
     printf("-------------------------------\n");
-    */
-    }
-    
+*/  }
     return 0;
 }
