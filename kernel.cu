@@ -19,7 +19,7 @@ __global__ void matrixMultiplicationKernel(int* A, int* B, int* C, int N) {
             tmpSum += A[ROW * N + i] * B[i * N + COL];
         }
     }
-    C[ROW * N + COL] = tmpSum;
+    if(ROW * N + COL < N*N) C[ROW * N + COL] = tmpSum;
 }
 
 
