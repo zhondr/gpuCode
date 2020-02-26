@@ -14,8 +14,9 @@ int main()
 {
     // Perform matrix multiplication C = A*B
     // where A, B and C are NxN matrices
-    int N = 23;
+    int N = 22;
     int SIZE = N*N;
+    int cycleNum = 10000;
 
     // Allocate memory on the host
     vector<int> h_A(SIZE);
@@ -35,43 +36,37 @@ int main()
     dev_array<int> d_B(SIZE);
     dev_array<int> d_C(SIZE);
 
+    double gpuOverheadTime=0;
+    clock_t begin = clock();
     d_A.set(&h_A[0], SIZE);
     d_B.set(&h_B[0], SIZE);
+    clock_t end = clock();
+    gpuOverheadTime = gpuOverheadTime + ((double)(end - begin) / CLOCKS_PER_SEC);
 
     double time_spent=0;
+    double tmpGpuOverheadTime=0;
 
-    for (int i=0;i<10000;i++) {
-    clock_t begin = clock();
+    for (int i=0;i<cycleNum;i++) {
+      clock_t begin = clock();
+        matrixMultiplication(d_A.getData(), d_B.getData(), d_C.getData(), N);
+      clock_t end = clock();
+      time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
 
-    matrixMultiplication(d_A.getData(), d_B.getData(), d_C.getData(), N);
-
-    clock_t end = clock();
-    time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
-
-    cudaDeviceSynchronize();
-    d_C.get(&h_C[0], SIZE);
-    cudaDeviceSynchronize();
-
-//    clock_t end = clock();
-//    time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
-   }
-
-    //cudaMemcpy( h_C, d_C, bytes, cudaMemcpyDeviceToHost );
-    printf("N = %d\n",N);
-    printf("Time is calculated on 10000 cycles\n");
-    printf("\n");
-    printf("Overall time on GPU: %f\n",time_spent);
-    printf("Average time on GPU: %f\n",time_spent/10000);
-    printf("-------------------------------\n");
-    /*printf("Product of the matrices:\n");
-
-    for (int c = 0; c < N ; c++) {
-      for (int d = 0; d < N; d++)
-        printf("%d\t", h_C[c*N+d]);
-
-      printf("\n");
+      clock_t begin = clock();
+        cudaDeviceSynchronize();
+        d_C.get(&h_C[0], SIZE);
+        cudaDeviceSynchronize();
+      clock_t end = clock();
+      tmpGpuOverheadTime = tmpGpuOverheadTime + ((double)(end - begin) / CLOCKS_PER_SEC);
     }
-*/
+    gpuOverheadTime = gpuOverheadTime + tmpGpuOverheadTime/cycleNum;
+    printf("N = %d\n",N);
+    //printf("Time is calculated on %i cycles\n",cycleNum);
+    //printf("\n");
+    //printf("Overall time on GPU: %f\n",time_spent);
+    printf("Average time on GPU: %f\n",time_spent/cycleNum+gpuOverheadTime);
+    printf("-------------------------------\n");
+
 
     int *cpu_C;
     cpu_C=new int[SIZE];
@@ -79,7 +74,7 @@ int main()
 
     // Now do the matrix multiplication on the CPU
     int sum;
-    for (int i=0;i<10000;i++) {
+    for (int i=0;i<cycleNum;i++) {
     sum=0;
     clock_t begin = clock();
 
@@ -96,8 +91,8 @@ int main()
     time_spent = time_spent + ((double)(end - begin) / CLOCKS_PER_SEC);
    }
 
-    printf("Overall time on CPU: %f\n",time_spent);
-    printf("Average time on CPU: %f\n",time_spent/10000);
+    //printf("Overall time on CPU: %f\n",time_spent);
+    printf("Average time on CPU: %f\n",time_spent/cycleNum);
     printf("\n");
     printf("Product of the matrices:\n");
 
